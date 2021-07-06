@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-
-createApp(App).mount('#app')
+import WaveSurferVue from "wavesurfer.js-vue";
+ 
+createApp(App).use(WaveSurferVue).mount('#app')
