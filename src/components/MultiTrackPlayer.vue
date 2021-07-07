@@ -58,7 +58,6 @@ export default {
     })
   
     let playersPlay = () => {
-      console.log('all players ready')
       console.log('play')
 
       Object.keys(players).forEach(player => {
@@ -71,6 +70,20 @@ export default {
         }, 0);
       })
     }
+
+    let playersStop = () => {
+      console.log('stop')
+
+      Object.keys(players).forEach(player => {
+        players[player].value.waveSurfer.setMute(false);
+        console.log(players[player].value.waveSurfer.getVolume());
+        
+        setTimeout(() => {
+          players[player].value.waveSurfer.stop();
+          console.log(player + ' stopped');
+        }, 0);
+      })
+    }    
 
     let checkToPlayersPlay = () => {
       const unactivatedFound = Object.keys(ready).find((active) => {
@@ -100,6 +113,7 @@ export default {
           return (active === false)
         })
         if (unactivatedFound === false) return
+        console.log('all players ready')
         playersPlay()
       });
 
@@ -114,7 +128,15 @@ export default {
       });
     })
 
-    return { ...players, playersOptions, ready}
+    let play = () => {
+      playersPlay()
+    }
+    
+    let stop = () => {
+      playersStop()
+    }
+
+    return { ...players, playersOptions, ready, play, stop }
   }
 };
 </script>
