@@ -1,10 +1,10 @@
 <template>
   <wavesurfer 
-    v-for="player in Object.keys(_players)" 
-    :src="_players[player].file" 
-    :options="_players[player].options" 
-    :key="_players[player].name"
-    :ref="_players[player].name"
+    v-for="player in Object.keys(playersOptions)" 
+    :src="playersOptions[player].file" 
+    :options="playersOptions[player].options" 
+    :key="playersOptions[player].name"
+    :ref="playersOptions[player].name"
   >
   </wavesurfer>
 </template>
@@ -39,16 +39,16 @@ export default {
   setup(props) {
     const playerNames = Object.keys(props.playersOptions)
     let players = {}
-    let _players = ref(props.playersOptions)
+    let playersOptions = ref(props.playersOptions)
     let ready = {}
 
     playerNames.forEach(playerName => {
       players[playerName] = ref(null);
-      _players.value[playerName].name = playerName
-      _players.value[playerName].options = {
+      playersOptions.value[playerName].name = playerName
+      playersOptions.value[playerName].options = {
         plugins: [Cursor.create()],
       },
-      _players.value[playerName].ready = ref(false)      
+      playersOptions.value[playerName].ready = ref(false)      
     });
 
     let playersForWatch = []
@@ -87,13 +87,21 @@ export default {
       if (unactivatedFound) return
 
       playerNames.forEach(playerName => {
-        ready[playerName] = ref(_players.value[playerName].ready) 
+        ready[playerName] = ref(playersOptions.value[playerName].ready) 
         players[playerName].value.name = playerName
       })
 
       Object.keys(ready).forEach(r => {
         readyForWatch.push(ready[r])
       })
+
+      watch(readyForWatch, (activatedReady) => {
+        const unactivatedFound = activatedReady.find((active) => {
+          return (active === false)
+        })
+        if (unactivatedFound === false) return
+        playersPlay()
+      });
 
       console.log('all players initialized')
 
@@ -102,20 +110,11 @@ export default {
           console.log('ready ' + player.name);
           player.ready = true;
           ready[player.name].value = true
-          checkToPlayersPlay()
         })
       });
     })
 
-    watch(readyForWatch, (activatedReady) => {
-      debugger
-      const unactivatedFound = activatedReady.find((active) => {
-        return !active
-      })
-      if (unactivatedFound) return
-      playersPlay()
-    });
-    return { ...players, _players, ready }
+    return { ...players, playersOptions, ready}
   }
 };
 </script>
