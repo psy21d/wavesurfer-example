@@ -54,6 +54,7 @@ export default {
     let ready = {}
     let volume = null;
     let v = {}
+    let positionProcess = false
 
     playerNames.forEach(playerName => {
       players[playerName] = ref(null);
@@ -94,16 +95,25 @@ export default {
     }
     let playersStop = () => {
       console.log('stop')
+      positionProcess = true;
       Object.keys(players).forEach(player => {
         players[player].value.waveSurfer.setMute(false);
-        console.log(players[player].value.waveSurfer.getVolume());
-        
+        players[player].value.waveSurfer.stop();
+        console.log(player + ' stopped');
+      })
+      positionProcess = false;
+    }    
+
+    let playersPause = () => {
+      console.log('stop')
+      Object.keys(players).forEach(player => {
         setTimeout(() => {
-          players[player].value.waveSurfer.stop();
-          console.log(player + ' stopped');
+          players[player].value.waveSurfer.pause();
+          //console.log(player + ' stopped');
         }, 0);
       })
-    }    
+    }
+    
     let checkToPlayersPlay = () => {
       const unactivatedFound = Object.keys(ready).find((active) => {
         return !ready[active].value
@@ -111,18 +121,22 @@ export default {
       if (unactivatedFound) return
       playersPlay()
     }
+
     watch(playersForWatch, (activatedPlayers) => {
       const unactivatedFound = activatedPlayers.find((player) => {
         return !player
       })
       if (unactivatedFound) return
+
       playerNames.forEach(playerName => {
         ready[playerName] = ref(playersOptions.value[playerName].ready) 
         players[playerName].value.name = playerName
       })
+
       Object.keys(ready).forEach(r => {
         readyForWatch.push(ready[r])
       })
+
       watch(readyForWatch, (activatedReady) => {
         const unactivatedFound = activatedReady.find((active) => {
           return (active === false)
@@ -131,12 +145,22 @@ export default {
         console.log('all players ready')
         playersPlay()
       });
+
       console.log('all players initialized')
       activatedPlayers.forEach(player => {
         player.waveSurfer.on('ready', () => {
           console.log('ready ' + player.name);
           player.ready = true;
           ready[player.name].value = true
+        })
+
+        player.waveSurfer.on('seek', (position) => {
+          if (positionProcess) return;
+          positionProcess = true
+          Object.keys(players).forEach(pl => {
+            players[pl].value.waveSurfer.seekTo(position);
+          })
+          positionProcess = false
         })
       });
     })
@@ -147,7 +171,12 @@ export default {
     let stop = () => {
       playersStop()
     }
-    return { ...players, playersOptions, ready, play, stop, volume }
+    
+    let pause = () => {
+      playersPause()
+    }
+    
+    return { ...players, playersOptions, ready, play, stop, volume, pause }
   }
 };
 </script>

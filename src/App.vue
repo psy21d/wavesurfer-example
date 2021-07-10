@@ -1,5 +1,6 @@
 <template>
   <button @click="play">play</button>
+  <button @click="pause">pause</button>
   <button @click="stop">stop</button>
   
   <MultiTrackPlayer :playerOptions="playerOptions" ref="player"/>
@@ -40,7 +41,10 @@ export default {
     let stop = () => {
       player.value.stop()
     }
-    return { player, play, stop }
+    let pause = () => {
+      player.value.pause()
+    }
+    return { player, play, stop, pause }
   }
 }
 </script>
