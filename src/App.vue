@@ -3,7 +3,7 @@
   <button @click="pause">pause</button>
   <button @click="stop">stop</button>
   
-  <MultiTrackPlayer :playerOptions="playerOptions" ref="player"/>
+  <MultiTrackPlayer :playerOptions="playerOptions" :playState="playState" ref="player"/>
 </template>
 
 <script>
@@ -27,7 +27,8 @@ export default {
         playerC: {
           file: "/audio/Piano.mp3",
         }
-      }
+      },
+      playState: true,
     }
   },
   setup() {

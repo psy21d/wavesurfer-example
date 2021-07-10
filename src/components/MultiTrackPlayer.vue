@@ -45,6 +45,10 @@ export default {
           }
         }
       }
+    },
+    playState: {
+      type: Boolean,
+      default: true,
     }
   },
   setup(props) {
@@ -55,6 +59,7 @@ export default {
     let volume = null;
     let v = {}
     let positionProcess = false
+    let playState = props.playState
 
     playerNames.forEach(playerName => {
       players[playerName] = ref(null);
@@ -69,7 +74,7 @@ export default {
     volume = reactive(v)
 
     watch(volume, newVolume => {
-      console.log(newVolume)
+      //console.log(newVolume)
       Object.keys(newVolume).forEach(playerName => {
         players[playerName].value.waveSurfer.setVolume(newVolume[playerName] / 100)
       })
@@ -82,44 +87,39 @@ export default {
     })
   
     let playersPlay = () => {
-      console.log('play')
+      //console.log('play')
+      playState = true
       Object.keys(players).forEach(player => {
         players[player].value.waveSurfer.setMute(false);
-        console.log(players[player].value.waveSurfer.getVolume());
+        //console.log(players[player].value.waveSurfer.getVolume());
         
         setTimeout(() => {
           players[player].value.waveSurfer.play();
-          console.log(player + ' played');
+          //console.log(player + ' played');
         }, 0);
       })
     }
     let playersStop = () => {
-      console.log('stop')
+      //console.log('stop')
+      playState = false
       positionProcess = true;
       Object.keys(players).forEach(player => {
         players[player].value.waveSurfer.setMute(false);
         players[player].value.waveSurfer.stop();
-        console.log(player + ' stopped');
+        //console.log(player + ' stopped');
       })
       positionProcess = false;
     }    
 
     let playersPause = () => {
-      console.log('stop')
+      //console.log('stop')
+      playState = false
       Object.keys(players).forEach(player => {
         setTimeout(() => {
           players[player].value.waveSurfer.pause();
           //console.log(player + ' stopped');
         }, 0);
       })
-    }
-    
-    let checkToPlayersPlay = () => {
-      const unactivatedFound = Object.keys(ready).find((active) => {
-        return !ready[active].value
-      })
-      if (unactivatedFound) return
-      playersPlay()
     }
 
     watch(playersForWatch, (activatedPlayers) => {
@@ -142,14 +142,16 @@ export default {
           return (active === false)
         })
         if (unactivatedFound === false) return
-        console.log('all players ready')
-        playersPlay()
+        //console.log('all players ready')
+        if (playState) {
+          playersPlay()
+        }
       });
 
-      console.log('all players initialized')
+      //console.log('all players initialized')
       activatedPlayers.forEach(player => {
         player.waveSurfer.on('ready', () => {
-          console.log('ready ' + player.name);
+          //console.log('ready ' + player.name);
           player.ready = true;
           ready[player.name].value = true
         })
@@ -158,9 +160,18 @@ export default {
           if (positionProcess) return;
           positionProcess = true;
           let positionInSeconds = player.waveSurfer.getCurrentTime();
-          console.log(positionInSeconds);
+          //console.log(positionInSeconds);
           Object.keys(players).forEach(pl => {
-            players[pl].value.waveSurfer.play(positionInSeconds);
+            if (playState) {
+              players[pl].value.waveSurfer.play(positionInSeconds);  
+            } else {
+              players[pl].value.waveSurfer.setMute(true);
+              players[pl].value.waveSurfer.play(positionInSeconds);
+              setTimeout(() => {
+                players[pl].value.waveSurfer.playPause()
+                players[pl].value.waveSurfer.setMute(false);
+              }, 10);
+            }
           })
           positionProcess = false
         })
