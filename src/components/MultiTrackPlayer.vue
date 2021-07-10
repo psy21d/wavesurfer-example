@@ -156,9 +156,11 @@ export default {
 
         player.waveSurfer.on('seek', (position) => {
           if (positionProcess) return;
-          positionProcess = true
+          positionProcess = true;
+          let positionInSeconds = player.waveSurfer.getCurrentTime();
+          console.log(positionInSeconds);
           Object.keys(players).forEach(pl => {
-            players[pl].value.waveSurfer.seekTo(position);
+            players[pl].value.waveSurfer.play(positionInSeconds);
           })
           positionProcess = false
         })
