@@ -5,8 +5,11 @@
     v-for="player in Object.keys(playersOptions)" 
     :key="player"
   >
-    <div><knob v-model="volume[player]" :min="0" :max="200"></knob></div>
-    <div>
+    <div class="knob">
+      <knob v-model="volume[player]" :min="0" :max="200">
+      </knob>
+    </div>
+    <div class="wave">
       <wavesurfer
         :src="playersOptions[player].file" 
         :options="playersOptions[player].options"
@@ -49,6 +52,22 @@ export default {
     playState: {
       type: Boolean,
       default: true,
+    },
+    speed: {
+      type: Number,
+      default: 100,
+    }
+  },
+  watch: {
+    speed(newSpeed) {
+      console.log(newSpeed)
+      console.log(this.playersOptions)
+      console.log(this.players)
+      
+      const playerNames = Object.keys(this.playersOptions)
+      playerNames.forEach(playerName => {
+        this.players[playerName].value.waveSurfer.setPlaybackRate(newSpeed / 100)
+      })
     }
   },
   setup(props) {
@@ -60,6 +79,7 @@ export default {
     let v = {}
     let positionProcess = false
     let playState = props.playState
+    let speed = ref(props.speed)
 
     playerNames.forEach(playerName => {
       players[playerName] = ref(null);
@@ -163,7 +183,7 @@ export default {
           //console.log(positionInSeconds);
           Object.keys(players).forEach(pl => {
             if (playState) {
-              players[pl].value.waveSurfer.play(positionInSeconds);  
+              players[pl].value.waveSurfer.play(positionInSeconds);
             } else {
               players[pl].value.waveSurfer.setMute(true);
               players[pl].value.waveSurfer.play(positionInSeconds);
@@ -189,13 +209,10 @@ export default {
       playersPause()
     }
     
-    return { ...players, playersOptions, ready, play, stop, volume, pause }
+    return { ...players, players, playersOptions, ready, play, stop, volume, pause }
   }
 };
 </script>
-
-<style scoped>
-</style>
 
 <style scoped>
 .playerbox {
@@ -205,5 +222,11 @@ export default {
 .track {
   display: flex;
   flex-direction: row;
+}
+.knob {
+  align-self: center;
+}
+.wave {
+  flex-grow: 1;
 }
 </style>
