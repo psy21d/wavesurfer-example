@@ -8,12 +8,12 @@
       </knob>
     </div>
   </div>
-  <MultiTrackPlayer :playerOptions="playerOptions" :playState="playState" :speed="speed" ref="player"/>
+  <MultiTrackPlayer :playersOptions="playersOptions" :playState="playState" :speed="speed" ref="player"/>
 </template>
 
 <script>
 import MultiTrackPlayer from '@/components/MultiTrackPlayer.vue'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import Knob from 'primevue/knob';
 
 export default {
@@ -24,7 +24,7 @@ export default {
   },
   data() {
     return {
-      playerOptions: {
+      playersOptions: {
         playerA: {
           file: "/audio/Bass.mp3",
         },
@@ -33,6 +33,9 @@ export default {
         },
         playerC: {
           file: "/audio/Piano.mp3",
+          plugins: {
+            timeline: true,
+          }
         }
       },
       speed: 100,
@@ -42,9 +45,11 @@ export default {
     let player = ref(player)
     let playState = ref(true)
 
-    watch(player, (newValuePlayer) => {
-      window.player = newValuePlayer;
-    })
+    document.body.addEventListener("resize", () => {
+      console.log("resize")
+      player.value.onResize()
+    });
+
     let play = () => {
       player.value.play()
       playState.value = true
