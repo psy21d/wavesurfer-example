@@ -1,44 +1,44 @@
 <template>
-<div class="playerbox">
-  <div 
-    class="track" 
-    v-for="player in Object.keys(playersOptions)" 
-    :key="player"
-  >
-    <div class="knob">
-      <knob v-model="volume[player]" :min="0" :max="200" :size="60">
-      </knob>
-    </div>
-    <div class="wave">
-      <wavesurfer
-        class="wavesurfer"
-        :src="playersOptions[player].file" 
-        :options="playersOptions[player].options"
-        :ref="playersOptions[player].name"
-      >
-      </wavesurfer>
-      <div
-        class="wave-timeline"
-        :ref="`timeline-${playersOptions[player].name}`"
-        :id="`wave-timeline-${playersOptions[player].name}`"
-      ></div>
+  <div class="playerbox">
+    <div 
+      class="track" 
+      v-for="player in Object.keys(playersOptions)" 
+      :key="player"
+    >
+      <div class="knob knob-voume">
+        <knob v-model="volume[player]" :min="0" :max="200" :size="60">
+        </knob>
+      </div>
+      <div class="wave">
+        <wavesurfer
+          class="wavesurfer"
+          :src="playersOptions[player].file" 
+          :options="playersOptions[player].options"
+          :ref="playersOptions[player].name"
+        >
+        </wavesurfer>
+        <div
+          class="wave-timeline"
+          :ref="`timeline-${playersOptions[player].name}`"
+          :id="`wave-timeline-${playersOptions[player].name}`"
+        ></div>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
 /* eslint-disable */
-import WaveSurfer from'wavesurfer.js'
+import WaveSurfer from'wavesurfer.js';
 import Cursor from "wavesurfer.js/dist/plugin/wavesurfer.cursor";
-import Timeline from'wavesurfer.js/dist/plugin/wavesurfer.timeline'
+import Timeline from'wavesurfer.js/dist/plugin/wavesurfer.timeline';
 import { watch, ref, reactive } from 'vue';
 import Knob from 'primevue/knob';
 
 export default {
   name: 'MTP',
   components: {
-    Knob
+    Knob,
   },
   props: {
     playersOptions: {
@@ -47,15 +47,18 @@ export default {
         return {
           playerA: {
             file: "/audio/Bass.mp3",
+            caption: "default playerA",
             plugins: {
               timeline: true,
             }
           },
           playerB: {
             file: "/audio/Drums.mp3",
+            caption: "default playerB",
           },
           playerC: {
             file: "/audio/Piano.mp3",
+            caption: "default playerC",
           }
         }
       }
@@ -71,10 +74,6 @@ export default {
   },
   watch: {
     speed(newSpeed) {
-      console.log(newSpeed)
-      console.log(this.playersOptions)
-      console.log(this.players)
-      
       const playerNames = Object.keys(this.playersOptions)
       playerNames.forEach(playerName => {
         this.players[playerName].value.waveSurfer.setPlaybackRate(newSpeed / 100)
@@ -82,7 +81,7 @@ export default {
     }
   },
   unmounted() {
-     document.removeEventListener("resize", this.onResize);
+     window.removeEventListener("resize", this.onResize);
   },
   setup(props) {
     const playerNames = Object.keys(props.playersOptions)
@@ -101,14 +100,13 @@ export default {
       timelines[`timeline-${playerName}`] = ref(null)
       playersOptions.value[playerName].name = playerName
       playersOptions.value[playerName].options = {
-        plugins: [Cursor.create()]
+        plugins: [Cursor.create()],
+        height: 60,
       }
       if (playersOptions.value[playerName].plugins && playersOptions.value[playerName].plugins.timeline) {
         playersOptions.value[playerName].options.plugins.push(Timeline.create({
-          //container: `#wave-timeline-${playerName}`,
-          //container: timelines[`timeline-${playerName}`],
           container: timelines[`timeline-${playerName}`],
-          height: 30
+          height: 10
         }))
       }
       playersOptions.value[playerName].ready = ref(false)
@@ -135,6 +133,8 @@ export default {
         players[player].value.waveSurfer.drawBuffer();
       })
     }
+
+    window.addEventListener('resize', onResize);
   
     let playersPlay = () => {
       onResize();
@@ -256,6 +256,9 @@ export default {
 }
 .knob {
   align-self: center;
+}
+.knob-voume {
+  margin-right: 16px;
 }
 .wave {
   flex-grow: 1;

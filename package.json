@@ -17,6 +17,7 @@
     "sass-loader": "^12.1.0",
     "vue": "^3.0.0",
     "vue-knob-control": "^1.6.0",
+    "vue3-resize-sensor": "^2.0.2",
     "wavesurfer.js": "^5.1.0",
     "wavesurfer.js-vue": "^1.0.0"
   },

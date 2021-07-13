@@ -1,8 +1,14 @@
 <template>
   <div class="panel">
-    <div><button class="button-set" @click="stop"><img src="/icons/stop.png"></button></div>
-    <div><button class="button-set" @click="pause"><img src="/icons/pause.png"></button></div>
-    <div><button class="button-set" @click="play"><img :src="playState ? '/icons/playnow.png' : '/icons/play.png'"></button></div>
+    <div class="button">
+      <IconStop @click="stop" />
+    </div>
+    <div class="button">
+      <IconPause @click="pause" />
+    </div>
+    <div class="button">
+      <IconPlay @click="play" :playState="playState" />
+    </div>
     <div>
       <knob v-model="speed" :min="0" :max="200" :size="60">
       </knob>
@@ -12,14 +18,20 @@
 </template>
 
 <script>
-import MultiTrackPlayer from '@/components/MultiTrackPlayer.vue'
-import { ref } from 'vue'
+import MultiTrackPlayer from '@/components/MultiTrackPlayer.vue';
+import { ref } from 'vue';
 import Knob from 'primevue/knob';
+import IconStop from "@/buttons/Stop.vue";
+import IconPause from "@/buttons/Pause.vue";
+import IconPlay from "@/buttons/Play.vue";
 
 export default {
   name: 'App',
   components: {
     MultiTrackPlayer,
+    IconStop,
+    IconPause,
+    IconPlay,
     Knob,
   },
   data() {
@@ -27,12 +39,15 @@ export default {
       playersOptions: {
         playerA: {
           file: "/audio/Bass.mp3",
+          caption: "default playerA",
         },
         playerB: {
           file: "/audio/Drums.mp3",
+          caption: "default playerB",
         },
         playerC: {
           file: "/audio/Piano.mp3",
+          caption: "default playerC",
           plugins: {
             timeline: true,
           }
@@ -44,11 +59,6 @@ export default {
   setup() {
     let player = ref(player)
     let playState = ref(true)
-
-    document.body.addEventListener("resize", () => {
-      console.log("resize")
-      player.value.onResize()
-    });
 
     let play = () => {
       player.value.play()
@@ -72,8 +82,10 @@ export default {
   display: flex;
   flex-direction: row;
 }
-.button-set {
-  background: none;
-  border: none;
+.button {
+  width: 40px;
+  height: 48px;
+  margin: 5px;
+  align-self: center;
 }
 </style>
