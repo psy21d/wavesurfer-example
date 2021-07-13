@@ -82,10 +82,14 @@ export default {
   display: flex;
   flex-direction: row;
 }
+.button-set {
+  background: none;
+  border: none;
+}
 .button {
   width: 40px;
-  height: 48px;
-  margin: 5px;
-  align-self: center;
+    height: 48px;
+    margin: 5px;
+    align-self: center;
 }
 </style>
