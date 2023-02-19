@@ -1,4 +1,9 @@
-# waveplayer
+# multi wave player
+
+# Cool thing, real!
+### https://lucid-franklin-14347c.netlify.app/
+
+
 
 ## Project setup
 ```
